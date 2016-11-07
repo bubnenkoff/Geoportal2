@@ -1,0 +1,174 @@
+﻿@import "bootstrap.css";
+@import "leaflet.css";
+@import "vue.datepicker.css";
+@import "leaflet-measure.css";
+@import "font-awesome.css";
+
+html, body
+{
+ margin: 0;
+ padding: 0;
+/*height: 90vh;*/
+height: 100vh;
+
+}
+
+.headerimg 
+{
+	background-image: url("");
+	background-size: cover;
+	height: 40px; /* Высота шапки */
+}
+
+.panel-footer
+{
+	background-image: url("");
+	min-height: 30px;
+	text-align: center;
+
+}
+
+.MainContainer
+{
+	border: dashed 1px black;
+	box-sizing: border-box;
+	width: 100%;
+	display: flex;
+	height: 80vh; /* HACK!*/
+}
+
+/* Контейнер содержащий боковое меню*/
+.SideMenu
+{
+	border: dashed black 2px;
+	resize: horizontal;
+	overflow: auto;
+	border: dashed 1px black;
+	min-width: 100px;
+	max-width: 30vh;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+/* Каждый отдельный элемент меню */
+.SideMenuItem
+{
+	padding: 2px;
+	width: 100%;
+}
+
+/* Заголовок каждого меню */
+.MenuItemHeadName
+{
+	border: dashed green 1px;
+	margin-top: 0;
+	margin-bottom: 10px;
+	display: flex;
+	margin: 0;
+	height: 4%;
+	/*width: 100%;*/
+	justify-content: center;
+}
+
+/* Содержимое Секции. Для кажой свое. Эта для инструментов */
+.InstrumentsMenuSectionContent 
+{
+	border: dotted black 1px;
+	margin: 2px;
+	/*width: 100%;*/
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around; 
+}
+
+.LayersMenuSectionContent
+{
+	display: flex;
+	flex-direction: column;
+}
+
+ul /* change bootstrap defaults */
+{
+	padding-left: 5px;
+	padding-top: 2px;
+	margin-bottom: 3px;
+}
+
+/* Сами кнопки меню */
+.InstrumentsMenuSectionItem
+{
+/*	border: dashed 1px red; */
+	margin: 2px;
+	width: 47%; 
+	min-width: 32px;
+	min-height: 32px;
+	max-height: 62px;
+	max-width: 64px;
+}
+
+
+/* Содержимое Секции. Для кажой свое. Эта для инструментов */
+.InstrumentsMenuSectionContent
+{
+	border: dotted black 1px;
+	margin: 2px;
+	/*width: 100%;*/
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around; 
+}
+
+
+/* Содержимое Секции. Для кажой свое. Эта для инструментов */
+.LayersMenuSectionContent
+{
+	border: dotted black 1px;
+	margin: 2px;
+	/*width: 100%;*/
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around; 
+}
+
+ #map
+ {
+ 	/*border: 1px dashed black;*/
+	width: 100%;
+	height: 100%;
+ }
+
+ hr
+ {
+ 	border: dotted black 1px;
+ 	margin-top: 0px;
+ 	margin-bottom: 4px;
+ /*	color: red;
+ 	background-color: red;*/
+ }
+
+.calendar
+{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+}
+
+.calendarItem
+{
+	margin-bottom: 4px;
+}
+
+.imgType /* Чекбоксы для выбора типа изображения */
+{
+	display: flex;
+	/*flex-wrap: row;*/
+	justify-content: space-around;
+	width: 100%;
+}
+
+input[type="date"], input[type="time"] {
+   border: 1px solid black;
+   border-radius: 3px;
+}
+
+

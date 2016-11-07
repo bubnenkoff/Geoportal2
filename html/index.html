@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<title>GeoPortal</title>
+		<script src="js/vue.js"></script>
+		<script src="js/vue-router.js"></script>
+		<script src="js/vue-resource.js"></script>
+		<script src="js/authorization.js"></script>
+		<script src="js/pagecontent.js"></script>
+		<script src="js/mymap.js"></script>
+		<script src="js/notification.js"></script>
+		<script src="js/app.js"></script>
+
+		<script src="js/leaflet.js"></script>
+		<script src="js/leaflet.draw.js"></script>
+		<script src="js/searchjs.js"></script>
+		
+		<script src="http://momentjs.com/downloads/moment.min.js"></script>
+
+		<script src="http://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js"></script>
+		<script src="http://cdn-geoweb.s3.amazonaws.com/terraformer-wkt-parser/1.1.0/terraformer-wkt-parser.min.js"></script>   
+
+		<link href="css/common.css" rel="stylesheet">
+		<link rel="stylesheet" href="css/leaflet.draw.css" />
+
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<div id="app">
+			<div class="container-fluid fill">
+				<nav class="navbar navbar-default">
+
+					<div class="headerimg">
+
+						<div class="container-fluid" >
+							
+								<div class="navbar-header" >
+									<a class="navbar-brand" href="#">
+										
+									</a>
+								</div>
+							
+						</div>
+					</div>
+					     <component :username.sync="username" :password.sync="password" :is="topMenuView" ></component>
+
+				</nav>
+
+					<component v-ref:user-content :is="contentView"></component>
+					<!-- <component :is="contentView" :myarr="myarr"></component> -->
+
+				<div class="panel panel-default">
+					<div class="panel-footer">GeoPortal 2016 (с)</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+</html>

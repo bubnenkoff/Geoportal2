@@ -1,0 +1,13 @@
+{
+	"name": "geoportal",
+	"description": "GeoPortal",
+	"copyright": "Copyright © 2016, Dmitry Bubnenkov",
+	"authors": ["Dmitry Bubnenkov"],
+	"versions": ["VibeCustomMain"],
+	"dependencies": {
+		"vibe-d": "~>0.7.30",
+		"ddbc": "~>0.3.2",
+	},
+	
+	"buildRequirements": ["allowWarnings"]
+}
