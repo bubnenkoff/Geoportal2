@@ -219,7 +219,7 @@ var userContent = Vue.extend({
 
                          // var ar1 = (item.imageBounds).split(" ");
                          var xbounds = JSON.parse('[' + item.imageBounds + ']');
-                         var fullURL = "/files/rasters_previews/" + item.img_src + "_" + item.img_type + "/" + (item.datetime).slice(2, 4) + "/" + (item.datetime).slice(5, 7) + "/" + item.name;
+                         var fullURL = "/files/rasters_previews/" + item.name;
                          console.log("xbounds: ", xbounds);
                          console.log("fullURL: ", fullURL);
 

@@ -46,6 +46,16 @@ void main()
     dbSetup(); // first run
 
     auto router = new URLRouter;
+    /*
+    @rootPathFromName
+    interface IMyAPI
+    {
+        Json postAuth();
+        void getLogout();
+        Json postGetdata();
+        Json getDbdata();
+    }
+    */
 
     router.get("/*", serveStaticFiles(roothtml));
 
@@ -55,9 +65,9 @@ void main()
     
     router.any("*", &accControl);
 
-    router.any("/checkAuthorization", &checkAuthorization);
-    router.any("/login", &login);
-    router.post("/logout", &logout);
+    router.any("/api/auth", &checkAuthorization);
+    router.any("/api/login", &login);
+    router.post("/api/logout", &logout);
 
     router.any("/upload", &upload);    
 
@@ -139,6 +149,9 @@ auto usersFromDB() // возвращаемую коллецию использу
 userCredentials checkCurrentUserСredentials(string login, string password) // проверяем того кто логинится на основании данных в БД
 {  
     userCredentials usercredentials;
+
+    writeln("login: ", login);
+    writeln("password: ", password);
 
     if (usersFromDB.canFind!(u=>u.login.toLower == login.toLower && u.password.toLower != password.toLower))
     {
@@ -274,7 +287,7 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
 
     try
     {      
-        auto usercredentials = checkCurrentUserСredentials(request["username"].to!string, request["password"].to!string);
+        auto usercredentials = checkCurrentUserСredentials(request["login"].to!string, request["password"].to!string);
         
         // response. responseBody should be nested in "success" or "fail" block. Like {"fail": {...}}
         Json responseStatus = Json.emptyObject;
@@ -290,7 +303,7 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
                 logInfo("-------------------------------------------------------------------------------");
                 logInfo(responseStatus.toString); // include responseBody
                 logInfo("^-----------------------------------------------------------------------------^");                              
-                logWarn("WRONG password for USER: %s", request["username"]); //getting username from request
+                logWarn("WRONG password for USER: %s", request["login"]); //getting login from request
                 //output: {"login":{"isAuthorized":false,"password":"wrongPassword"},"status":"fail"}
             }
 
@@ -298,7 +311,7 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
             if (usercredentials.isExists && usercredentials.passwordOK)
             {
                 ////////ALL RIGHT///////////
-                 logInfo("User: %s | Password: %s", request["username"].to!string, request["password"].to!string);
+                 logInfo("User: %s | Password: %s", request["login"].to!string, request["password"].to!string);
                  
                 if (!req.session) //if no session start one
                 {
@@ -310,25 +323,25 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
                 try
                   {
                        // Set Session
-                       req.session.set!string("login", request["username"].to!string);
+                       req.session.set!string("login", request["login"].to!string);
                        req.session.set("isAdmin", true); // set шаблонная функция явное указание типа можно опустить
 
                        responseStatus["status"] = "success";
                        responseBody["isAuthorized"] = true;
                        responseBody["isAdmin"] = true;
-                       responseBody["username"] = request["username"].to!string; // admin!
+                       responseBody["login"] = request["login"].to!string; // admin!
                        responseStatus["login"] = responseBody;
 
                        logInfo("-------------------------------------------------------------------------------");
                        logInfo(responseStatus.toString); // include responseBody
                        logInfo("^-----------------------------------------------------------------------------^");
-                       logInfo("Admin session for user: %s started", request["username"].to!string);
-                       // {"login":{"isAuthorized":true,"isAdmin":true,"username":"admin"},"status":"success"}
+                       logInfo("Admin session for user: %s started", request["login"].to!string);
+                       // {"login":{"isAuthorized":true,"isAdmin":true,"login":"admin"},"status":"success"}
                     }
 
                     catch(Exception e)
                     {
-                        writeln("Error during admin login:", request["username"].to!string);
+                        writeln("Error during admin login:", request["login"].to!string);
                         writeln(e.msg);
                     }
                 }
@@ -336,20 +349,20 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
                 {
                     try
                     {
-                       req.session.set("login", request["username"].to!string); //set current username in parameter of session name
+                       req.session.set("login", request["login"].to!string); //set current login in parameter of session name
                        req.session.set("isAdmin", false); // set шаблонная функция явное указание типа можно опустить
 
                        responseStatus["status"] = "success";
                        responseBody["isAuthorized"] = true;
                        responseBody["isAdmin"] = false;
-                       responseBody["username"] = request["username"].to!string; // user!
+                       responseBody["login"] = request["login"].to!string; // user!
                        responseStatus["login"] = responseBody;
 
                        logInfo("-------------------------------------------------------------------------------");
                        logInfo(responseStatus.toString); // include responseBody
                        logInfo("^------------------------------------------------------------------------------^");
                        logInfo("User session for user: %s started", _auth.user.login);
-                   // {"login":{"isAuthorized":true,"isAdmin":false,"username":"test"},"status":"success"}
+                   // {"login":{"isAuthorized":true,"isAdmin":false,"login":"test"},"status":"success"}
 
                         logInfo(responseStatus.toString);
                         //res.writeJsonBody(responseStatus);
@@ -368,13 +381,13 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
             if (!usercredentials.isExists)
             {
                 responseStatus["status"] = "fail"; // user exists in DB, password NO
-                responseBody["username"] = "userDoNotExists"; // user exists in DB, password NO
+                responseBody["login"] = "userDoNotExists"; // user exists in DB, password NO
                 responseBody["isAuthorized"] = false;
                 responseStatus["login"] = responseBody;
                 logInfo("-------------------------------------------------------------------------------");
                 logInfo(responseStatus.toString); // include responseBody
                 logInfo("^-----------------------------------------------------------------------------^");                              
-                logWarn("User %s DO NOT exist in DB", request["username"]); //getting username from request
+                logWarn("User %s DO NOT exist in DB", request["login"]); //getting username from request
 
             }
 

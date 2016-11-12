@@ -1,13 +1,29 @@
 function sendLoginInfo()
   {
-      var loginData = new Object();
-      //data that we take from user input
-      loginData["username"] = this.username;
-      loginData["password"] = this.password;
+      var loginData = 
+      {
+      	login : this.username,
+      	password : this.password,
+      	language : "",
+      	country : ""
+      }
+      /*
+      // http://jsonapi.org/format/1.1/
+		{
+		 "data":
+			{
+			 "type" : "auth"
+			},
+		 "meta": 
+			{
+				"token": ""	
+			}
+		}
+      */
 
-      console.log("site login/password: ", loginData); 
+      console.log("site loginData: ", loginData); 
 
-      this.$http.post('/login', loginData).then(function (response) {
+      this.$http.post('/api/login', loginData).then(function (response) {
         console.log("server response: ", response.data)
 
         if(response.data["status"] == "success") // process only if we got status=success
@@ -72,7 +88,7 @@ function checkAuth()
 
   console.log("Checking if user already have active session"); 
 
-	this.$http.post('/checkAuthorization').then(function (response) {
+	this.$http.post('/api/auth').then(function (response) {
 	     console.log("server response: ", response.data)
 
 	     if(response.data["status"] == "success") // process only if we got status=success
@@ -120,7 +136,7 @@ function checkAuth()
 	  console.log(loginData);
 	  console.log("-------------------------");
 
-	this.$http.post('/logout', loginData).then(function (response) {
+	this.$http.post('/api/logout', loginData).then(function (response) {
 	    console.log("server response: ", response.data)
 	    if(response.data["isAuthorized"] == false)
 	    {
