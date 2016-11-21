@@ -126,6 +126,7 @@ void dbSetup()
     {
         writeln("Can't setup DB");
         writeln(e.msg);
+        throw e;
         
     }
 

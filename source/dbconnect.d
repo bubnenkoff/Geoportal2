@@ -52,6 +52,7 @@ class GeoDataBase
 		{
 			writeln("Can't connect to DataBase on host: ", config.dbhost);
 			writeln(e.msg);
+			throw e;
 		}
 
 	}
@@ -218,7 +219,7 @@ class GeoDataBase
 	}
 
 
-	Json getBaseMapVectorLayers(Json request) // return JSON with data
+	Json getBaseMapVectorLayers(Json request)
 	{
 		VectorMetadata vectormetadata;
 		VectorMetadata [] vectormetadatas; // declarated in global
