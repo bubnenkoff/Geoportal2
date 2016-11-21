@@ -21,8 +21,6 @@ import parseconfig;
 import globals;
 
 
-// SQLLite will store shp converted to geoJSON
-
 class GeoDataBase
 {
 	Config config;
@@ -38,10 +36,25 @@ class GeoDataBase
 	    string url = MySQLDriver.generateUrl(config.dbhost, to!ushort(config.dbport), config.dbname);
 	    params = MySQLDriver.setUserAndPassword(config.dbuser, config.dbpass);
 	    ds = new ConnectionPoolDataSourceImpl(driver, url, params);
-		conn = ds.getConnection();
-	    
 	}	
 
+	void Connect() // создаем объект подключения
+	{
+		try 
+		{
+			if(conn !is null)
+			{
+				conn = ds.getConnection();	
+			}
+		}
+
+		catch (SQLException e)
+		{
+			writeln("Can't connect to DataBase on host: ", config.dbhost);
+			writeln(e.msg);
+		}
+
+	}
 
 
 	void dbInsert(string login, string uploading_date, string geometry_type, string data)
@@ -62,7 +75,7 @@ class GeoDataBase
 			writeln(request);
 			writeln;
 		}
-
+	
      	// some processing of request
 		
 
@@ -123,7 +136,16 @@ class GeoDataBase
 	   		writeln(sqlSelect);
 	   		writeln;
 	   	}
-	   auto rs = stmt.executeQuery(sqlSelect);
+	   ResultSet rs;
+	   try
+	   {
+	   		rs = stmt.executeQuery(sqlSelect);
+	   }
+
+	   catch(Exception e) 
+	   {
+	   		fLogger.put(e.msg);
+	   }
 	    
 	   int imgFounded = 0;
 

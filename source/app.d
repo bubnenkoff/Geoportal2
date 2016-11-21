@@ -1,4 +1,5 @@
 import vibe.d;
+
 import std.stdio;
 import std.conv;
 import std.algorithm;
@@ -6,7 +7,6 @@ import std.datetime;
 import std.path;
 import std.uni : toLower;
 import std.file;
-import std.experimental.logger;
 
 import draft.database;
 import parseconfig;
@@ -27,10 +27,10 @@ string roothtml;
 
 static this()
 {
-    
-    roothtml = buildPath(getcwd, "html") ~ "\\";
+
+    roothtml = buildPath(getcwd, "html");
     if(!roothtml.exists)
-       writeln("[ERROR] HTML dir do not exists");     
+       writeln("[ERROR] HTML dir do not exists"); 
 
 }
 
@@ -228,7 +228,8 @@ void dbdata(HTTPServerRequest req, HTTPServerResponse res) // process rasters an
         }
     */
 
-    GeoDataBase gdb = new GeoDataBase(config); // SQLite routines
+    GeoDataBase gdb = new GeoDataBase(config); // 
+    gdb.Connect(); // создаем подключение
     scope(exit) destroy(gdb); // mark instance to GC
     
     // gdb.dbSetup(); // if DB not exists create it.

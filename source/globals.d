@@ -1,6 +1,7 @@
 module globals;
 
 import std.stdio;
+import vibe.d;
 import std.datetime;
 
 import vibe.data.json;
@@ -9,6 +10,7 @@ import vibe.data.json;
 
 DateTime currentdt;
 string datestamp;
+FileLogger fLogger;
 
 shared static this()
 {
