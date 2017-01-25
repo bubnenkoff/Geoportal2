@@ -19,7 +19,7 @@ var guestContent = Vue.extend({
                   login: <b>user</b><br/>
                   pass: <b>123</b><br/>
                   <hr />
-                  GeoPortal allow user to look for sattelite images of zone of interest and fizualize earth quakes. 
+                  GeoPortal allow user to look for sattelite images for zone of interest and fizualize earth quakes. 
                   <br>Server side is very compact and portable. Compiled version of geoserver size is only 2.5MB plus about 1MB of external libs.<br>
                   Client size is written with Vue.js and Leaflet.
               </div>
