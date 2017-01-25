@@ -22,16 +22,13 @@ shared static this()
 struct ImgMetadata
 {
     string id;
-    string img_src;
-    string img_type;
-    string coordinates;
     string name;
-    string datetime;
+    string apparature;
+    string processing_type;
+    string date;
     string imageBounds;
+    // string coordinates; координаты там возвразать не нужно. отрисовка идет по границам imageBounds
 }
-
-ImgMetadata [] imgmetadatas; // declarated in global
-ImgMetadata imgmetadata;
 
 
 struct VectorMetadata
@@ -40,9 +37,6 @@ struct VectorMetadata
     string name;
     string coordinates;
 }
-
-//VectorMetadata [] vectormetadatas; // declarated in global
-//VectorMetadata vectormetadata;
 
 struct EQMetadata
 {
@@ -53,6 +47,3 @@ struct EQMetadata
     string regionname;
     string coordinates;
 }
-
-//EQMetadata [] eqmetadatas; // declarated in global
-//EQMetadata eqmetadata;

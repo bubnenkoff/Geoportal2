@@ -98,29 +98,14 @@ Window.map.on('draw:created', function (e) {
 
       console.log("startdate: ", startdate);
 
-      var types = [];
-      // Вычисляем тип выбранных снимоков:
-      if(App.$refs.userContent.img_vis)
-        types.push("vis");
-
-      if(App.$refs.userContent.img_ir)
-        types.push("ir");
-
-      if(App.$refs.userContent.img_rgb)
-        types.push("rgb");
-
-      if(App.$refs.userContent.img_enh)
-        types.push("enh"); 
-
       // к дате начала и конца нужно прибавить часы и минуты из соответсвующих полей
-
 
       var DataBody = {
         "request_type": request_type,
         "startdate" : startdate,
         "enddate" : enddate,
         "coordinates" : coordinates,
-        "types" : types
+        "types" : App.$refs.userContent.selected_apparature
       };
 
 

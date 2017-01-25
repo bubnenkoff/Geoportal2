@@ -3,19 +3,25 @@ var guestContent = Vue.extend({
       template: `
 
       <!-- <p>Guest content</p> -->
-   <div class="row">
+   <div class="row" style="height: 79%;">
               <div class="col-md-1"> <!-- .col-md-8 --> </div>
 
               <div class="col-md-11">
-                  Для доступа к порталу необходимо авторизироваться.<br/>
+                  For access authorization required.<br/>
                   <hr />
-                  Доступ к панеле администрирования (пока заглушка):<br/>
-                  логин: admin<br/>
-                  пароль: 123<br/>
-                  <p>
-                  Панель пользователя (сама карта):<br/>
-                  логин: user<br/>
-                  пароль: 123<br/>
+                  <!-- 
+                  Admin panel (not implemented):<br/>
+                  login: admin<br/>
+                  pass: 123<br/>
+                  <p> 
+                  -->
+                  User panel (main map):<br/>
+                  login: <b>user</b><br/>
+                  pass: <b>123</b><br/>
+                  <hr />
+                  GeoPortal allow user to look for sattelite images of zone of interest and fizualize earth quakes. 
+                  <br>Server side is very compact and portable. Compiled version of geoserver size is only 2.5MB plus about 1MB of external libs.<br>
+                  Client size is written with Vue.js and Leaflet.
               </div>
 
    </div>  
@@ -42,15 +48,16 @@ var userContent = Vue.extend({
                               <li><input type="checkbox" @click="EnableDisableVectorLayer(obj.id)"/>{{obj.name}}</li>
                           <ul>  
                       </div>
-
+             
                       <!-- Заголовок Раздела Секции меню -->
-                     <div class="MenuItemHeadName">Instruments</div>
+               
+              <!--       <div class="MenuItemHeadName">Instruments</div> -->
                       
                         <!-- Содержимое Раздела Секции меню -->
-                       <div class="InstrumentsMenuSectionContent">
+             <!--        <div class="InstrumentsMenuSectionContent">
                             <div>
-                               <button class="btn btn-default fa fa-play-circle" @click="StartAnimation()">Анимировать</button>
-                               <span v-if="rasters_imgs_list.length > 0">
+                               <button class="btn btn-default fa fa-play-circle" @click="StartAnimation()">Animation</button>
+                               <span v-if="rasters_imgs_list.length > 1"> // проверка должна быть на ноль, но что-то не удаляется
                                    <select v-model="selected_img_src">
                                     <option v-for="m in img_src" v-bind:value="m">
                                       {{ m }}
@@ -60,26 +67,32 @@ var userContent = Vue.extend({
 
                             </div>
                         </div>
-                      
+                -->      
 
                       <!-- Заголовок Раздела Секции меню -->
                      <div class="MenuItemHeadName">Images Params</div>
                       
                       <!-- Содержимое Раздела Секции меню -->
                      <div class="InstrumentsMenuSectionContent">
-                        <div>Диапазон дат:</div>   
+                        <div>Date Range:</div>   
                           <div class="calendar">
                                 <div class="calendarItem"><input type="date" v-model="img_startdate"> <input type="time" step="900" v-model="img_starttime"></div>
                                 <div class="calendarItem"><input type="date" v-model="img_enddate"> <input type="time" step="900" v-model="img_endtime"></div>
                            </div> 
 
-                          <div>Тип изображения:</div>
-                          <div class="imgType">
-                            <div><input type="checkbox" v-model="img_vis"/>vis</div>
-                            <div><input type="checkbox" v-model="img_ir"/>ir</div>
-                            <div><input type="checkbox" v-model="img_rgb"/>rgb</div>
-                            <div><input type="checkbox" v-model="img_enh"/>enh</div>
+                          <div>Img Type:</div>
+                          <div class="imgType" v-if="apparature_types.length > 0">
+                            <div v-for="apparate in apparature_types">
+                              <div><input type="checkbox" checked v-model="selected_apparature" v-bind:value="apparate">{{apparate}}</div>
+                            </div>
                           </div>
+
+                          <div v-if="apparature_types.length == 0">
+                                 Can't get Img Type List from Server
+                          </div>  
+
+
+                     
                       </div>
 
                     <!-- Заголовок Раздела Секции меню -->
@@ -87,15 +100,15 @@ var userContent = Vue.extend({
                       
                       <!-- Содержимое Раздела Секции меню -->
                      <div class="InstrumentsMenuSectionContent">
-                            <div>Диапазон дат:</div>   
+                            <div>Date Range:</div>   
                             <div class="calendar">
                                   <div class="calendarItem"><input type="date" v-model="eq_startdate"></div>
                                   <div class="calendarItem"><input type="date" v-model="eq_enddate"></div>
                              </div> 
-                        <div>Магнитуда &GreaterEqual; {{magnitude_value}}</div>
+                        <div>Magnitude &GreaterEqual; {{magnitude_value}}</div>
                           <input id="magnitude_slider" type="range" min="1" max="8" v-model="magnitude_value" step="1" />
-                         <button style="margin-top: 5px;" class="btn btn-default" @click="EqRequest()">Запросить</button>
-                         <div style="width: 100%; text-align: center;" v-if="eq_nodata_flag">Нет данных</div>
+                         <button style="margin-top: 5px;" class="btn btn-default" @click="EqRequest()">Request</button>
+                         <div style="width: 100%; text-align: center;" v-if="eq_nodata_flag">No Data</div>
                       </div>
 
 
@@ -111,8 +124,8 @@ var userContent = Vue.extend({
                                   </div>
                               <ul>
 
-                              <div v-if="m.imgTotalCount == 0">
-                                 Нет доступных изображений
+                              <div v-if="m.imgTotalCount == 0" transition="bounce">
+                                 No Images
                               </div>  
                               
                            
@@ -147,8 +160,8 @@ var userContent = Vue.extend({
             vector_layers : [], // Добавленные на карту слои (полные их данные) ID из БД
             img_starttime: "", //если время указано, мы прибавим его к img_startdate и img_enddate соотвтественно
             img_endtime: "", // ditto
-            img_startdate: new Date((new Date()).valueOf() - 1000*3600*24*3).toISOString().slice(0,10), // дата начала всегда на три дня позади // Заполняем все в mymap.js
-            img_enddate: new Date().toISOString().slice(0,10), // текущая дата. Старше чем Сегодня снимков не бывает // просто текущая дата: new Date().toISOString().slice(0,10)
+            img_startdate: new Date(2010, 08, 22).toISOString().slice(0,10), //new Date((new Date()).valueOf() - 1000*3600*24*3).toISOString().slice(0,10), // дата начала всегда на три дня позади // Заполняем все в mymap.js
+            img_enddate: new Date(2017, 02, 02).toISOString().slice(0,10), //new Date().toISOString().slice(0,10), // текущая дата. Старше чем Сегодня снимков не бывает // просто текущая дата: new Date().toISOString().slice(0,10)
             img_vis : true,
             img_ir : false,
             img_rgb : false,
@@ -158,10 +171,11 @@ var userContent = Vue.extend({
             selected_img_src : "", // текущий выбранный тип изображения для анимации. Переменная выставляется после выбора в меню
             magnitude_value: 4, // магнитуда значение по умолчанию
             eq_layers_list: [], // масисв точечных слоев землетрясений
-            eq_startdate: new Date((new Date()).valueOf() - 1000*3600*24*3).toISOString().slice(0,10), // дата начала всегда на три дня позади // Заполняем все в mymap.js
-            eq_enddate: new Date().toISOString().slice(0,10), // текущая дата. Старше чем Сегодня снимков не бывает // просто текущая дата: new Date().toISOString().slice(0,10)
+            eq_startdate: new Date(2016, 11, 28).toISOString().slice(0,10), //new Date((new Date()).valueOf() - 1000*3600*24*3).toISOString().slice(0,10), // дата начала всегда на три дня позади // Заполняем все в mymap.js
+            eq_enddate: new Date(2017, 01, 02).toISOString().slice(0,10), //new Date().toISOString().slice(0,10), // текущая дата. Старше чем Сегодня снимков не бывает // просто текущая дата: new Date().toISOString().slice(0,10)
             eq_nodata_flag : false, // в интерфейсе нужно как-то сообщить, что данных нет. Другой способ перебирать все слои, но он хуже
-
+            apparature_types : [], // список типов изображений которые есть на сервере
+            selected_apparature : [], // список выбранной аппаратуры
           }
 
           },
@@ -171,6 +185,7 @@ var userContent = Vue.extend({
               //drawmap.call(this)
              drawmap.this;
              drawmap();
+            getImagesTypes.call(this);
              //
             // getBaseMap.this;
               getBaseMapLayerList(); // для начала получим имена и id имеющихся слоев
@@ -213,24 +228,26 @@ var userContent = Vue.extend({
                 {  
                    App.$refs.userContent.rasters_imgs_list.forEach(function(item) { 
                         // some fields include metadata like imgTotalCount. Skip them
-                       if(item.coordinates)
+                       if(item.imageBounds)
                        {
                          console.log(item.imageBounds);
 
                          // var ar1 = (item.imageBounds).split(" ");
                          var xbounds = JSON.parse('[' + item.imageBounds + ']');
-                         var fullURL = "/files/rasters_previews/" + item.name;
+                         var fullURL = "/rasters_previews/" + item.name; // было /files/rasters_previews/
                          console.log("xbounds: ", xbounds);
                          console.log("fullURL: ", fullURL);
 
                          // layer_item would have type "<ILayer> layer". elements from this list we would use for 
                          var layer_item = L.imageOverlay(fullURL, xbounds).addTo(Window.map);
                              layer_item.iterable_num = item.id; // создаем поле с индексным номером. этот номер нужен для удаления т.к. при изменении порядка сортировки могут быть глюки
-                             layer_item.img_src_type = item.img_src + "_" + item.img_type; // записываем тип источника для того, чтобы потом при переборке слоев можно было бы с ним что-то делать
+                          // анимации у нас не будет т.к. зоны разные все   layer_item.img_src_type = item.img_src + "_" + item.img_type; // записываем тип источника для того, чтобы потом при переборке слоев можно было бы с ним что-то делать
                          App.$refs.userContent.rasters_layers_list.push(layer_item);
 
 
                        // попутно заполним для того чтобы дальше можно было фильтровать изображения //http://v1.vuejs.org/guide/forms.html
+                       /* 
+                         // анимации у нас не будет т.к. зоны разные все 
                         if(item.img_src)
                         {
                           if(!App.$refs.userContent.img_src.includes(item.img_src + "_" + item.img_type))
@@ -239,6 +256,7 @@ var userContent = Vue.extend({
                           }
                           
                         }
+                      */
 
 
 
@@ -392,6 +410,7 @@ var userContent = Vue.extend({
                       {
                         for (eq of mydata)
                         {
+                          console.log("parsing: ", eq.id);
                           var geojson = Terraformer.WKT.parse(eq.coordinates); // нам нужно поле геометрия т.к. из него GeoJSON формируется
                           console.log(geojson);
                           console.log("eq.type: ", eq.coordinates);
@@ -424,16 +443,16 @@ var userContent = Vue.extend({
                             console.log("----------");
                             if(eq.magnitude <= 4)
                             {
-                              var mylayer = L.circle([x, y], smallEQ).addTo(Window.map).bindPopup('<strong>Магнитуда</strong>: '+ eq.magnitude + '<br><strong>Дата</strong>: ' + eq.date + '</strong><br><strong>Район</strong>: ' + eq.regionname);
+                              var mylayer = L.circle([x, y], smallEQ).addTo(Window.map).bindPopup('<strong>Magnitude</strong>: '+ eq.magnitude + '<br><strong>Date</strong>: ' + eq.date + '</strong><br><strong>Region</strong>: ' + eq.regionname);
                             }
 
                             if(eq.magnitude > 4 && eq.magnitude < 6)
                             {
-                              var mylayer = L.circle([x, y], bigEQ).addTo(Window.map).bindPopup('<strong>Магнитуда</strong>: '+ eq.magnitude + '<br><strong>Дата</strong>: ' + eq.date + '</strong><br><strong>Район</strong>: ' + eq.regionname);
+                              var mylayer = L.circle([x, y], bigEQ).addTo(Window.map).bindPopup('<strong>Magnitude</strong>: '+ eq.magnitude + '<br><strong>Date</strong>: ' + eq.date + '</strong><br><strong>Region</strong>: ' + eq.regionname);
                             }
                             if(eq.magnitude >= 6)
                             {
-                              var mylayer = L.circle([x, y], ultrabigEQ).addTo(Window.map).bindPopup('<strong>Магнитуда</strong>: '+ eq.magnitude + '<br><strong>Дата</strong>: ' + eq.date + '</strong><br><strong>Район</strong>: ' + eq.regionname);
+                              var mylayer = L.circle([x, y], ultrabigEQ).addTo(Window.map).bindPopup('<strong>Magnitude</strong>: '+ eq.magnitude + '<br><strong>Date</strong>: ' + eq.date + '</strong><br><strong>Region</strong>: ' + eq.regionname);
                             }
 
                           mylayer.mylayer_id = eq.id; // записываем в слой id который есть который равен id из БД. Чтобы была возможность их потом сопоставлять

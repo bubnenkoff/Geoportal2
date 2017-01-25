@@ -23,6 +23,7 @@ import globals;
 
 class GeoDataBase
 {
+
 	Config config;
 	MySQLDriver driver;
 	DataSource ds;
@@ -38,34 +39,34 @@ class GeoDataBase
 	    ds = new ConnectionPoolDataSourceImpl(driver, url, params);
 	}	
 
-	void Connect() // создаем объект подключения
-	{
-		try 
+
+		void Connect() // создаем объект подключения
 		{
-			if(conn !is null)
+			try 
 			{
-				conn = ds.getConnection();	
+				if(conn is null)
+				{
+					conn = ds.getConnection();
+				}
 			}
-		}
 
-		catch (SQLException e)
-		{
-			writeln("Can't connect to DataBase on host: ", config.dbhost);
-			writeln(e.msg);
-			throw e;
-		}
-
+			catch (SQLException e)
+			{
+				writeln("[ERROR] Can't connect to DataBase on host: ", config.dbhost);
+				writeln(e.msg);
+				throw e;
+			}
 	}
+
 
 
 	void dbInsert(string login, string uploading_date, string geometry_type, string data)
 	{
 	   
 	    Statement stmt = conn.createStatement();
-		string sqlinsert = (`INSERT INTO usersshapes (userlogin, uploading_date, geometry_type, data) VALUES ('%s', '%s', '%s', '%s') `, login, uploading_date, geometry_type, data); 
+		string sqlinsert = format(`INSERT INTO usersshapes (userlogin, uploading_date, geometry_type, data) VALUES ('%s', '%s', '%s', '%s') `, login, uploading_date, geometry_type, data); 
 		stmt.executeUpdate(sqlinsert);
 		scope(exit) stmt.close(); // closing
-
 	}
 
 	Json getIMGsMetadataFromDB(Json request) // return JSON with data
@@ -107,16 +108,16 @@ class GeoDataBase
 	    */
 		writeln(`request["types"]: `, request["types"]);
 
-	    string img_type_regexp;
+	    string apparature_type;
 	    if(request["types"].toString == "[]") // если запрос прилетел пустой селект пустым `[]` будет падать поэтому нужно создать временную переменную и туда что то положить
 	    {
-	    	img_type_regexp = "0"; // просто пустышку ставим, аначе при селекте будет падать
+	    	apparature_type = "0"; // просто пустышку ставим, аначе при селекте будет падать
 	    }
 	    else
 	    {
 	    	// для выполенния запроса к БД нужно привести содержимое поля к виду REGEXP т.е. : WHERE img_type REGEXP 'vis|ir'
 	    	// сейчас поле содержит: ["img_vis","img_ir","img_rgb"]
-	    	img_type_regexp = request["types"].toString().replace(`","`,`|`).replace(`["`,``).replace(`"]`,``);
+	    	apparature_type = request["types"].toString().replace(`","`,`|`).replace(`["`,``).replace(`"]`,``);
 	    }
 
 
@@ -127,7 +128,9 @@ class GeoDataBase
 	   // put `coordinates` as value for SELECT 
 	   // пример: SELECT imgs.img_id, img_params.Coordinates, imgs.name, imgs.imgDateTime, img_params.imageBounds FROM imgs INNER JOIN img_params ON imgs.src_id = img_params.id WHERE imgs.reproj_status='DONE';
 //	   string sqlSelect = `SELECT id, ST_AsWKT(Coordinates), Name, Date, imageBounds FROM rasters_previews WHERE ST_Intersects(Coordinates, GEOMFROMTEXT('` ~  to!string(request["coordinates"]).replace(`"`,``) ~ `', 0 ));`; // do not forget remove quotes
-	   string sqlSelect = `SELECT imgs.img_id, img_src, img_type, ST_AsWKT(img_params.Coordinates), imgs.name, DATE_FORMAT(imgs.imgDateTime, '%Y-%m-%d'), img_params.imageBounds FROM imgs INNER JOIN img_params ON imgs.src_id = img_params.id WHERE imgs.reproj_status='DONE' AND ST_Intersects(Coordinates, GEOMFROMTEXT('` ~  to!string(request["coordinates"]).replace(`"`,``) ~ `', 0 )) AND img_type REGEXP '` ~ img_type_regexp ~ `' AND imgDateTime BETWEEN '` ~ request["startdate"].get!string ~ `' AND '` ~  request["enddate"].get!string ~ `';`; // do not forget remove quotes
+	   string sqlSelect = `SELECT imgs.id, imgs.Name, imgs.apparature, imgs.processing_type, DATE_FORMAT(imgs.Date, '%Y-%m-%d'),  imgs.imageBounds, ST_AsWKT(imgs.Coordinates) FROM imgs WHERE ST_Intersects(Coordinates, GEOMFROMTEXT('` ~  to!string(request["coordinates"]).replace(`"`,``) ~ `', 0 )) AND imgs.apparature REGEXP '` ~ apparature_type ~ `' AND imgs.Date BETWEEN '` ~ request["startdate"].get!string ~ `' AND '` ~  request["enddate"].get!string ~ `';`; // do not forget remove quotes
+	   
+	   //string sqlSelect = `SELECT imgs.img_id, img_src, img_type, ST_AsWKT(img_params.Coordinates), imgs.name, DATE_FORMAT(imgs.imgDateTime, '%Y-%m-%d'), img_params.imageBounds FROM imgs INNER JOIN img_params ON imgs.src_id = img_params.id WHERE imgs.reproj_status='DONE' AND ST_Intersects(Coordinates, GEOMFROMTEXT('` ~  to!string(request["coordinates"]).replace(`"`,``) ~ `', 0 )) AND img_type REGEXP '` ~ apparature_type ~ `' AND imgDateTime BETWEEN '` ~ request["startdate"].get!string ~ `' AND '` ~  request["enddate"].get!string ~ `';`; // do not forget remove quotes
 	   writeln(sqlSelect);
 	   writeln("^^^sqlSelect^^^");
 	  // readln;
@@ -147,6 +150,10 @@ class GeoDataBase
 	   {
 	   		fLogger.put(e.msg);
 	   }
+
+		ImgMetadata [] imgmetadatas; // declarated in global
+		ImgMetadata imgmetadata;
+	   
 	    
 	   int imgFounded = 0;
 
@@ -155,12 +162,11 @@ class GeoDataBase
 		{
     		imgFounded++;	
 			imgmetadata.id = to!string(rs.getInt(1));
-			imgmetadata.img_src = to!string(rs.getString(2));
-			imgmetadata.img_type = to!string(rs.getString(3));
-			imgmetadata.coordinates = to!string(rs.getString(4));
-			imgmetadata.name = to!string(rs.getString(5));
-			imgmetadata.datetime = to!string(rs.getString(6));
-			imgmetadata.imageBounds = to!string(rs.getString(7));
+			imgmetadata.name = to!string(rs.getString(2));
+			imgmetadata.apparature = to!string(rs.getString(3));
+			imgmetadata.processing_type = to!string(rs.getString(4));
+			imgmetadata.date = to!string(rs.getString(5));
+			imgmetadata.imageBounds = to!string(rs.getString(6));
 
 			imgmetadatas ~= imgmetadata;
 			imgmetadataAsString ~= serializeToJsonString(imgmetadata) ~ `, `;
@@ -226,8 +232,18 @@ class GeoDataBase
 		
 
 		Json vectorMetadata = Json.emptyArray; // Это поле мы заполним ниже
+		
+	   Statement stmt;
+	   	try
+	   	{
+	   		stmt = conn.createStatement();	
+	   	}
 
-	   Statement stmt = conn.createStatement();
+	   	catch(SQLException e)
+	   	{
+	   		writeln("Снова пытаемся поймать и не получается: ", e.msg); // 0x0044E76B in vibe.data.json.Json dbconnect.GeoDataBase.getBaseMapVectorLayers(vibe.data.json.Json) dbconnect.d(235)
+	   	}
+	   	
 	   scope(exit) stmt.close(); // close on exit
 
 	   string sqlSelect;
@@ -293,7 +309,7 @@ class GeoDataBase
 	   Statement stmt = conn.createStatement();
 	   scope(exit) stmt.close(); // close on exit
 
-	   string sqlSelect = `SELECT id, DATE_FORMAT(date, '%Y-%m-%d %H:%i'), eqBounds, magnitude, regionname, ST_AsWKT(coordinates) from eq WHERE magnitude >=` ~ request["magnitude"].toString ~ ` AND date BETWEEN '` ~ request["startdate"].get!string ~ `' AND '` ~  request["enddate"].get!string ~ `';`; // do not forget remove quotes
+	   string sqlSelect = `SELECT id, DATE_FORMAT(date, '%Y-%m-%d %H:%i'), magnitude, regionname, ST_AsWKT(coordinates) from eq WHERE magnitude >=` ~ request["magnitude"].toString ~ ` AND date BETWEEN '` ~ request["startdate"].get!string ~ `' AND '` ~  request["enddate"].get!string ~ `';`; // do not forget remove quotes
 	   debug 
 	   	{
 	   		writeln("SQL request to get EQ: ");
@@ -312,10 +328,10 @@ class GeoDataBase
 				
 				eqmetadata.id = to!string(rs.getInt(1));
 				eqmetadata.date = to!string(rs.getString(2)); // Нельзя чтобы в БД было нулевое значение
-				eqmetadata.eqBounds = to!string(rs.getString(3));
-				eqmetadata.magnitude = to!string(rs.getString(4));
-				eqmetadata.regionname = to!string(rs.getString(5));
-				eqmetadata.coordinates = to!string(rs.getString(6));
+			//	eqmetadata.eqBounds = to!string(rs.getString(3));
+				eqmetadata.magnitude = to!string(rs.getString(3));
+				eqmetadata.regionname = to!string(rs.getString(4));
+				eqmetadata.coordinates = to!string(rs.getString(5));
 				eqmetadatas ~= eqmetadata;
 				//imgmetadataAsString ~= serializeToJsonString(vectormetadata) ~ `, `;
 				eqCount++;
@@ -338,6 +354,36 @@ class GeoDataBase
 		writeln(eqmetadatas.serializeToJson());
 
 		return eqmetadatas.serializeToJson(); // return to caller data. Caller is: res.writeJsonBody(
+
+	}
+
+	Json getApparatureTypes(Json request) // get images types
+	{
+	   Statement stmt = conn.createStatement();
+	   scope(exit) stmt.close(); // close on exit
+
+	   string sqlSelect = `SELECT apparature FROM img_params;`; 
+	   
+	   string [] apparature;
+
+	   try
+	   {
+			auto rs = stmt.executeQuery(sqlSelect);
+			
+			while (rs.next())
+			{
+				apparature ~=  to!string(rs.getString(1));
+			}
+
+	   }
+	   catch(Exception e)
+	   {
+	   		writeln(e.msg);
+	   }
+		
+		writeln("apparature: ", apparature.serializeToJson());
+
+		return apparature.serializeToJson(); // return to caller data. Caller is: res.writeJsonBody(
 
 	}
 

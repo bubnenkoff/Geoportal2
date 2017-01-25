@@ -1,4 +1,3 @@
-window.hostname = 'http://127.0.0.1:8080';
 var App = null; // it's global because function behind will overwrite it's with Vue App instance
 window.onload = function() {
 
@@ -6,19 +5,19 @@ Vue.use(VueResource); // ?
 //Vue.use(VueTables.client, {} ); // ?
 
 var GuestMenu = Vue.extend({
-     props : ['username','password'],
+     props : ['login','password'],
       template: `
         <div id="auth">
             <form class="form-inline pull-right">
                 <div class="form-group">
-                    <label class="sr-only" for="UserName">User name</label>
-                  <input type="username" v-model="username" class="form-control" id="UserName" placeholder="username">
+                    <label class="sr-only" for="login">User name</label>
+                  <input type="login" v-model="login" class="form-control" id="login" placeholder="login">
                 </div>
                 <div class="form-group">
                   <label class="sr-only" for="Password">Password</label>
                   <input type="password" v-model="password" class="form-control" id="Password" placeholder="Password">
                 </div>
-              <button type="submit" class="btn btn-default" v-on:click.prevent="sendLoginInfo()">Войти</button>
+              <button type="submit" class="btn btn-default" v-on:click.prevent="sendLoginInfo()">Login</button>
             </form>
         </div>`,
 
@@ -36,14 +35,14 @@ var GuestMenu = Vue.extend({
           });
 
  var UserMenu = Vue.extend({
-  props : ['username'],
+  props : ['login'],
       template: `
               <ul class="nav nav-tabs">
                 <li role="user" class="active"><a href="#">USER</a></li>
                 <li role="user"><a href="#">USER</a></li>
                 <li role="user"><a href="#">USER</a></li>
-                <li class="form-inline pull-right"><button type="submit" class="btn btn-default" v-on:click="logout()">Выйти</button> </li>
-                <li style="line-height: 35px; margin-right: 10px;" class="pull-right">Hello, <strong>{{username}}</strong></li> 
+                <li class="form-inline pull-right"><button type="submit" class="btn btn-default" v-on:click="logout()">Exit</button> </li>
+                <li style="line-height: 35px; margin-right: 10px;" class="pull-right">Hello, <strong>{{login}}</strong></li> 
               </ul> 
           `,
 
@@ -55,13 +54,13 @@ var GuestMenu = Vue.extend({
         });     
 
  var AdminMenu = Vue.extend({
-  props : ['username'],
+  props : ['login'],
       template: `
               <ul class="nav nav-tabs">
                 <li role="admin" class="active"><a href="#">Admin</a></li>
                 <li role="admin"><a href="#">Admin</a></li>
                 <li role="admin"><a href="#">Messages</a></li>
-                <li class="form-inline pull-right"><button type="submit" class="btn btn-default" v-on:click="logout()">Выйти</button> </li>
+                <li class="form-inline pull-right"><button type="submit" class="btn btn-default" v-on:click="logout()">Exit</button> </li>
                 <li style="line-height: 35px; margin-right: 10px;" class="pull-right">Hello, <strong>admin!</strong></li> 
               </ul>`,
 
@@ -100,7 +99,7 @@ App = new Vue ({ // App -- is need for overwrite global var. Global var need dec
     {
       topMenuView: "guestmenu",
       contentView: "guestcontent",
-      username: "",
+      login: "",
       password: "",
       // rasters_previews_list : []
      // table_of_content_rasters_previews_items_list: []

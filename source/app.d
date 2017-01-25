@@ -127,7 +127,6 @@ void dbSetup()
         writeln("Can't setup DB");
         writeln(e.msg);
         throw e;
-        
     }
 
 
@@ -261,6 +260,11 @@ void dbdata(HTTPServerRequest req, HTTPServerResponse res) // process rasters an
         res.writeJsonBody(gdb.getBaseMapVectorLayers(request));
     }
 
+    else if (request["request_type"] == "apparature_types") // base map vector layers ВСЕ данные
+    {
+        res.writeJsonBody(gdb.getApparatureTypes(request));
+    }    
+
     else
     {
         writeln("Unknown request type: ");
@@ -281,7 +285,7 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
 {
 
    Json request = req.json;
-    //writeln(to!string(request["username"]));
+    //writeln(to!string(request["login"]));
     writeln("-------------JSON OBJECT from site:-------------");
     writeln(request);
     writeln("^-----------------------------------------------^");
@@ -389,7 +393,7 @@ void login(HTTPServerRequest req, HTTPServerResponse res)
                 logInfo("-------------------------------------------------------------------------------");
                 logInfo(responseStatus.toString); // include responseBody
                 logInfo("^-----------------------------------------------------------------------------^");                              
-                logWarn("User %s DO NOT exist in DB", request["login"]); //getting username from request
+                logWarn("User %s DO NOT exist in DB", request["login"]); //getting login from request
 
             }
 
@@ -421,7 +425,7 @@ void checkAuthorization(HTTPServerRequest req, HTTPServerResponse res)
         responseStatus["status"] = "success";
         responseBody["isAuthorized"] = true;
         responseBody["isAdmin"] = false;
-        responseBody["username"] = req.session.get!string("login");
+        responseBody["login"] = req.session.get!string("login");
         responseStatus["login"] = responseBody;
         writeln(req.session.get!string("login"));
         if(req.session.get!bool("isAdmin"))
@@ -433,7 +437,7 @@ void checkAuthorization(HTTPServerRequest req, HTTPServerResponse res)
         res.writeJsonBody(responseStatus);
         logInfo(responseStatus.toString); // include responseBody
 
-    //example: {"login":{"isAuthorized":true,"isAdmin":false,"username":"test"},"status":"success"}
+    //example: {"login":{"isAuthorized":true,"isAdmin":false,"login":"test"},"status":"success"}
 
     }
     // Login info we should check only with /login
@@ -445,7 +449,7 @@ void checkAuthorization(HTTPServerRequest req, HTTPServerResponse res)
         responseStatus["status"] = "success";
         responseBody["isAuthorized"] = false;
         responseBody["isAdmin"] = false;
-        responseBody["username"] = "guest";
+        responseBody["login"] = "guest";
         
         responseStatus["login"] = responseBody;
 
@@ -475,7 +479,7 @@ void logout(HTTPServerRequest req, HTTPServerResponse res)
             logInfo("-------------------------------------------------------------------------------");
             logInfo(responseBody.toString);
             logInfo("^-----------------------------------------------------------------------------^");                              
-            logInfo("User %s logout", request["username"]); //
+            logInfo("User %s logout", request["login"]); //
         }
 
         else

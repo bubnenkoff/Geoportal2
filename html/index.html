@@ -9,6 +9,7 @@
 		<script src="js/mymap.js"></script>
 		<script src="js/notification.js"></script>
 		<script src="js/app.js"></script>
+		<script src="js/utils.js"></script>
 
 		<script src="js/leaflet.js"></script>
 		<script src="js/leaflet.draw.js"></script>
@@ -26,7 +27,7 @@
 	</head>
 	<body>
 		<div id="app">
-			<div class="container-fluid fill">
+			<div class="container-fluid fill" >
 				<nav class="navbar navbar-default">
 
 					<div class="headerimg">
@@ -41,12 +42,11 @@
 							
 						</div>
 					</div>
-					     <component :username.sync="username" :password.sync="password" :is="topMenuView" ></component>
+					     <component :login.sync="login" :password.sync="password" :is="topMenuView" ></component>
 
 				</nav>
 
 					<component v-ref:user-content :is="contentView"></component>
-					<!-- <component :is="contentView" :myarr="myarr"></component> -->
 
 				<div class="panel panel-default">
 					<div class="panel-footer">GeoPortal 2016 (с)</div>

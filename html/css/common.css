@@ -6,10 +6,9 @@
 
 html, body
 {
- margin: 0;
- padding: 0;
-/*height: 90vh;*/
-height: 100vh;
+margin: 0;
+padding: 0;
+height: 100%;
 
 }
 
@@ -170,5 +169,39 @@ input[type="date"], input[type="time"] {
    border: 1px solid black;
    border-radius: 3px;
 }
+
+/* Animation part */
+.bounce-transition {
+  display: inline-block; /* otherwise scale animation won't work */
+}
+.bounce-enter {
+  animation: bounce-in 1s;
+}
+.bounce-leave {
+  animation: bounce-out 1s;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes bounce-out {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+/* Animation part */
 
 

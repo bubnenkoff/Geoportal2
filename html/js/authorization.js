@@ -2,24 +2,11 @@ function sendLoginInfo()
   {
       var loginData = 
       {
-      	login : this.username,
+      	login : this.login,
       	password : this.password,
       	language : "",
       	country : ""
       }
-      /*
-      // http://jsonapi.org/format/1.1/
-		{
-		 "data":
-			{
-			 "type" : "auth"
-			},
-		 "meta": 
-			{
-				"token": ""	
-			}
-		}
-      */
 
       console.log("site loginData: ", loginData); 
 
@@ -34,15 +21,17 @@ function sendLoginInfo()
 	          console.log("We are Authorized: isAuthorized == true");
 	          App.topMenuView = 'adminmenu'; //Change current view!
 	          App.contentView = 'admincontent';
-	          userLoginNotification("Welcome, " + loginData["username"], "Login success"); // notificate admin
+	          userLoginNotification("Welcome, " + loginData["login"], "Login success"); // notificate admin
+	          App.login = loginData["login"];
 	        }
 	        //User
 	        else if(response.data.login.isAuthorized == true && response.data.login.isAdmin == false)
 	        {
 	          console.log("User is Authorized: isAuthorized == true");
-	          App.topMenuView = 'usermenu' //Change current view!
+	          App.topMenuView = 'usermenu'; //Change current view!
 	          App.contentView = 'usercontent';
-	          userLoginNotification("Welcome, " + loginData["username"], "Login success"); // notificate user
+	          userLoginNotification("Welcome, " + loginData["login"], "Login success"); // notificate user
+	          App.login = loginData["login"];
 	        }
 	     }
 
@@ -50,14 +39,14 @@ function sendLoginInfo()
         {
           if (response.data.login.username == "userDoNotExists")
           {
-          	console.log("User: " + loginData["username"] + " do not exists");
-          	userLoginNotification(`User "` + loginData["username"] + `" do not exists `, `Login failed`);	
+          	console.log("User: " + loginData["login"] + " do not exists");
+          	userLoginNotification(`User "` + loginData["login"] + `" do not exists `, `Login failed`);	
           }
 
           else if (response.data.login.password == "wrongPassword")
           {
-          	console.log("Wrong password for user: " + loginData["username"]);
-          	userLoginNotification("Wrong password for user: " + loginData["username"], "Login failed");	
+          	console.log("Wrong password for user: " + loginData["login"]);
+          	userLoginNotification("Wrong password for user: " + loginData["login"], "Login failed");	
           }
 
           else if (response.data.login.password == "ServerSideDBError") //Not Implemented on Server Side
@@ -93,13 +82,14 @@ function checkAuth()
 
 	     if(response.data["status"] == "success") // process only if we got status=success
 	     {
+
 	        //Admin
 	        if(response.data.login.isAuthorized == true && response.data.login.isAdmin == true)
 	        {
 	          console.log("We are already authorized on site as admin (F5 even accure)");
 	          App.topMenuView = 'adminmenu' //Change current view!
 	          App.contentView = 'admincontent';
-	          this.username = response.data.login.username; // get user name from response and set it to {{username}}
+	          App.login = response.data.login.login;
 	        }
 	        //User
 	        else if(response.data.login.isAuthorized == true && response.data.login.isAdmin == false)
@@ -107,7 +97,8 @@ function checkAuth()
 	          console.log("We are already authorized on site as user (F5 even accure)");
 	          App.topMenuView = 'usermenu' //Change current view!
 	          App.contentView = 'usercontent';
-	          App.username = response.data.login.username; // get user name from response and set it to {{username}}
+	          App.login = response.data.login.login; // get user name from response and set it to {{login}}
+
 	        }
 	     }
 
@@ -131,8 +122,8 @@ function checkAuth()
   {
   	  var loginData = new Object();
       //data that we take from user input
-      loginData["username"] = this.username; // username more then enough
-	  console.log("Logout username -> " + loginData["username"]);
+      loginData["login"] = App.login; // username more then enough
+	  console.log("Logout username -> " + App.login);
 	  console.log(loginData);
 	  console.log("-------------------------");
 
@@ -143,7 +134,7 @@ function checkAuth()
 	      console.log("Logout from site success");
 	      App.topMenuView = 'guestmenu' //Change current view!
 	      App.contentView = 'guestcontent';
-	      userLoginNotification("Goodbye, " + loginData["username"], "User Logout"); // notificate user
+	      userLoginNotification("Goodbye, " + App.login, "User Logout"); // notificate user
 	    }
 	});
 
