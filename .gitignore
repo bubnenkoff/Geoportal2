@@ -19,7 +19,6 @@ $RECYCLE.BIN/
 gdal/
 files/Shapes/*
 .dub/
-files/rasters_previews/*
 shapes_example
 
 # Windows shortcuts
