@@ -21,7 +21,7 @@ function sendLoginInfo()
 	          console.log("We are Authorized: isAuthorized == true");
 	          App.topMenuView = 'adminmenu'; //Change current view!
 	          App.contentView = 'admincontent';
-	          userLoginNotification("Welcome, " + loginData["login"], "Login success"); // notificate admin
+	         // userLoginNotification("Welcome, " + loginData["login"], "Login success"); // notificate admin
 	          App.login = loginData["login"];
 	        }
 	        //User
@@ -30,7 +30,7 @@ function sendLoginInfo()
 	          console.log("User is Authorized: isAuthorized == true");
 	          App.topMenuView = 'usermenu'; //Change current view!
 	          App.contentView = 'usercontent';
-	          userLoginNotification("Welcome, " + loginData["login"], "Login success"); // notificate user
+	        //  userLoginNotification("Welcome, " + loginData["login"], "Login success"); // notificate user
 	          App.login = loginData["login"];
 	        }
 	     }
