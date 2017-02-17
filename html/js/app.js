@@ -11,11 +11,11 @@ var GuestMenu = Vue.extend({
             <form class="form-inline pull-right">
                 <div class="form-group">
                     <label class="sr-only" for="login">User name</label>
-                  <input type="login" v-model="login" class="form-control" id="login" placeholder="login">
+                  <input type="login" v-model="login" class="form-control" id="login" placeholder="login" value="user">
                 </div>
                 <div class="form-group">
                   <label class="sr-only" for="Password">Password</label>
-                  <input type="password" v-model="password" class="form-control" id="Password" placeholder="Password">
+                  <input type="password" v-model="password" class="form-control" id="Password" placeholder="Password" value="123">
                 </div>
               <button type="submit" class="btn btn-default" v-on:click.prevent="sendLoginInfo()">Login</button>
             </form>
@@ -38,9 +38,6 @@ var GuestMenu = Vue.extend({
   props : ['login'],
       template: `
               <ul class="nav nav-tabs">
-                <li role="user" class="active"><a href="#">USER</a></li>
-                <li role="user"><a href="#">USER</a></li>
-                <li role="user"><a href="#">USER</a></li>
                 <li class="form-inline pull-right"><button type="submit" class="btn btn-default" v-on:click="logout()">Exit</button> </li>
                 <li style="line-height: 35px; margin-right: 10px;" class="pull-right">Hello, <strong>{{login}}</strong></li> 
               </ul> 
