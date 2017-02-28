@@ -4,11 +4,12 @@ function drawmap(imageUrl, imageBounds)
    var cities = new L.LayerGroup();
 
     var mbAttr = '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ',
-    mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
+    mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic3VsaW1hbjEyMyIsImEiOiJjaXA1dmo3OHUwMDA1eWJrb2Ewc3FtNmllIn0.K8PeGHbqr_NbczQbHlYmsA';
 
     var grayscale  = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
       streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr});
 
+	  
     Window.map = L.map('map', {
       center: [49, 20],
       zoom: 3,
